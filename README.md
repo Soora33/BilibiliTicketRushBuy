@@ -1,5 +1,11 @@
-# 兼容性
+# 个人自用
 需要使用numpy为 1.26.4配合opencv-python 4.7.0.7 可启动成功
+
+### 快速启动：
+- pip install -r requirements.txt
+- 配置 auto-bilibili的初始化抢购信息
+- python auto_bilibili.py
+
 
 
 # BilibiliTicketRushBuy
