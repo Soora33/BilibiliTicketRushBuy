@@ -1,53 +1,10 @@
 # 个人自用
-需要使用numpy为 1.26.4配合opencv-python 4.7.0.7 可启动成功
+python 版本为 3.11
 
 ### 快速启动：
 - pip install -r requirements.txt
 - 配置 auto-bilibili的初始化抢购信息
 - python auto_bilibili.py
-
-
-
-# BilibiliTicketRushBuy
- bilibili会员购抢票脚本，使用时需自行设置相关参数
-## 参数设置
-抢购时间设置：Main.py第12行
-
-目标抢购页面设置：Main.py第17行
-
-选择是否使用headless游览器：Main.py第15、16行
-
-场次选择：Main.py第20行
-
-价格选择：Main.py第21行
-
-可修改地址
-
-## 环境
-python == 3.10
-
-Google Chrome == 正式版
-
-## 使用流程
-1.按照上述操作设置好相关参数
-
-2.在项目所在路径打开cmd
-
-3.依次输入以下指令并运行：
-```
-pip install -r requirements.txt
-python Main.py
-```
-4.若有正常输出，则程序正常运行，请等待出现名为qrimg的窗口（其中内容为bilibili账号登录页面截图），待扫码登录后关闭qrimg窗口，随后程序将自动运行，无需额外操作。
-## TODO
-1.多线程运行
-
-2.可视化页面
-## 注意事项
-若pip安装出现网络问题，可尝试使用以下命令进行安装
-```
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-```
 
 
 使用程序前，请保证网络畅通和电脑时间为北京时间。
