@@ -1,24 +1,26 @@
 import datetime
 import time
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 import cv2
 
+
+
 def Init():
     ch_options = Options()
     ch_options.add_argument("--headless")
     global TargetTime
-    TargetTime = "2023-07-12 23:00:00.00000000"  # 设置抢购时间
+    TargetTime = "2025-02-24 12:00:00.00000000"  # 设置抢购时间
 
     global WebDriver
-    # WebDriver = webdriver.Chrome(chrome_options=ch_options)         #使用headless游览器，速度更快
-    WebDriver = webdriver.Chrome()  # 使用可视化游览器
-    WebDriver.get("https://show.bilibili.com/platform/detail.html?id=73710&from=pc_ticketlist")  # 输入目标购买页面
-
+    WebDriver = webdriver.Chrome(options=ch_options)         #使用headless游览器，速度更快
+    # WebDriver = webdriver.Chrome()  # 使用可视化游览器
+    WebDriver.get("https://show.bilibili.com/platform/detail.html?id=98212&from=pc_ticketlist")  # 输入目标购买页面
     global Price, Session
     Session = '1'  # 场次设置：修改引号内部的数字，数字对应第选项的序号，选项序号从左到右从1开始依次排列
-    Price = '1'  # 价格设置：设置方法与场次设置一样
+    Price = '3'  # 价格设置：设置方法与场次设置一样
 
     time.sleep(1)
     print("进入购票页面成功")
@@ -30,13 +32,14 @@ def Init():
     WebDriver.save_screenshot('./QRcode.png')
     qrimg = cv2.imread('./QRcode.png')
     cv2.imshow("qrimg", qrimg)
-    key = cv2.waitKey(0)
+    key = cv2.waitKey(10000)
     # WebDriver.find_element(By.CLASS_NAME, "bili-mini-close").click()
-
+    #
     # print("请在10s内登录")
     # time.sleep(10)
 
 def Select():
+    print('select')
     while True:
         try:
             WebDriver.find_element(By.XPATH, '/html/body/div/div[2]/div[2]/div[2]/div[2]/div[4]/ul[1]/li[2]/div[' + Session + ']').click()
@@ -47,6 +50,7 @@ def Select():
 
 
 def Wait():
+    print('wait')
     while True:
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         print(now + "     " + TargetTime)
@@ -66,8 +70,25 @@ def Buy():
             print("无法点击购买")
 
         try:
+            # 输入联系人姓名
+            name_input = WebDriver.find_element(By.XPATH, "//input[@placeholder='请输入联系人姓名']")
+            name_input.clear()
+            name_input.send_keys("xxx")
+
+            # 输入联系人手机号
+            phone_input = WebDriver.find_element(By.XPATH, "//input[@placeholder='请输入联系人手机号']")
+            phone_input.clear()
+            phone_input.send_keys("xxx")
+
             WebDriver.find_element(By.CLASS_NAME, "confirm-paybtn.active").click()
+
+            # element = WebDriverWait(WebDriver, 10).until(
+            #     EC.element_to_be_clickable((By.CLASS_NAME, "confirm-paybtn.active"))
+            # )
+            # element.click()
+
             print("订单创建完成，请在一分钟内付款")
+            return
             # time.sleep(60)
         except:
             print("无法点击创建订单")
@@ -78,5 +99,4 @@ if __name__ == '__main__':
     Select()
     Wait()
     Buy()
-
 

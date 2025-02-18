@@ -1,3 +1,7 @@
+# 兼容性
+需要使用numpy为 1.26.4配合opencv-python 4.7.0.7 可启动成功
+
+
 # BilibiliTicketRushBuy
  bilibili会员购抢票脚本，使用时需自行设置相关参数
 ## 参数设置
@@ -10,6 +14,9 @@
 场次选择：Main.py第20行
 
 价格选择：Main.py第21行
+
+可修改地址
+
 ## 环境
 python == 3.10
 
