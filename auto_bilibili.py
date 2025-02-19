@@ -1,12 +1,12 @@
 import datetime
-import time
-import yaml
 import random
+import time
 
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium import webdriver
 import cv2
+import yaml
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -103,11 +103,11 @@ def buy():
 
         try:
             try:
-                name_input = WebDriver.find_element(By.XPATH, "//input[@placeholder='请输入联系人姓名']")
+                name_input = WebDriver.find_element(By.XPATH, "/html/body/div/div[2]/div/section/div[2]/div[1]/div/input")
                 name_input.clear()
                 name_input.send_keys(name)
 
-                phone_input = WebDriver.find_element(By.XPATH, "//input[@placeholder='请输入联系人手机号']")
+                phone_input = WebDriver.find_element(By.XPATH, "/html/body/div/div[2]/div/section/div[2]/div[2]/div/input")
                 phone_input.clear()
                 phone_input.send_keys(phone)
             except:
