@@ -5,35 +5,29 @@ import time
 import cv2
 import yaml
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 # 初始化抢购信息(都是必填)
 # 地址
-# url = "https://show.bilibili.com/platform/detail.html?id=98212&from=pc_ticketlist"
-# url = "https://show.bilibili.com/platform/detail.html?id=97102&from=pc_ticketlist"
-url = "https://show.bilibili.com/platform/detail.html?id=96798&from=pc_ticketlist"
+url = "https://show.bilibili.com/platform/detail.html?id=98212&from=pc_ticketlist"
 # 抢购时间
-TargetTime = "2025-02-18 17:03:00.00000000"  # 设置抢购时间
+TargetTime = "2025-02-24 11:19:00.00000000"  # 设置抢购时间
 # 场地
 Session = '1'  # 场次设置：修改引号内部的数字，数字对应第选项的序号，选项序号从左到右从1开始依次排列
 # 价格
-Price = '4'  # 价格设置：设置方法与场次设置一样
-# 填写人名字
-name = 'xxx'
-# 填写人手机号（格式必须正确）
-phone = 'xxx'
+Price = '3'  # 价格设置：设置方法与场次设置一样
+# 选座 id 同时再页面也要点
+id = '2_22'
+# id = '11_16'
 
 def init():
-    headless_options = Options()
-    # 无头浏览器
-    headless_options.add_argument("--headless")
-    headless_options.add_argument("--window-size=1920,1080")
-    headless_options.add_argument("--disable-gpu")
-
     options = Options()
     # 反反爬虫措施
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -47,9 +41,7 @@ def init():
 
 
     global WebDriver
-    # WebDriver = webdriver.Chrome(options=headless_options)         #使用headless游览器，速度更快
     WebDriver = webdriver.Chrome(options)  # 使用可视化游览器
-    WebDriver.get(url)  # 输入目标购买页面
 
     # 反反爬虫措施
     WebDriver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
@@ -61,6 +53,8 @@ def init():
     })
     script = 'Object.defineProperty(navigator,"webdriver",{get:() => false,});'
     WebDriver.execute_script(script)
+
+    WebDriver.get(url)  # 输入目标购买页面
 
     time.sleep(1)
     print("进入购票页面成功")
@@ -94,30 +88,49 @@ def wait():
             break
 
 def buy():
+    wait = WebDriverWait(WebDriver, 30)  # 增加等待超时时间至30秒
     while True:
         try:
-            WebDriver.find_element(By.CLASS_NAME, "product-buy.enable").click()
+            # --- 点击购买按钮 ---
+            buy_button = wait.until(
+                EC.element_to_be_clickable((By.CLASS_NAME, "product-buy.enable"))
+            )
+            buy_button.click()
             print("进入购买页面成功")
-        except:
-            print("无法点击购买")
 
-        try:
+            # --- 处理可能的分场次/座位选择 ---
             try:
-                name_input = WebDriver.find_element(By.XPATH, "/html/body/div/div[2]/div/section/div[2]/div[1]/div/input")
-                name_input.clear()
-                name_input.send_keys(name)
 
-                phone_input = WebDriver.find_element(By.XPATH, "/html/body/div/div[2]/div/section/div[2]/div[2]/div/input")
-                phone_input.clear()
-                phone_input.send_keys(phone)
-            except:
-                pass
+                # 原逻辑保持（等待元素可点击）
+                WebDriverWait(WebDriver, 1).until(
+                    EC.element_to_be_clickable((By.ID, '3111'))
+                ).click()
 
-            WebDriver.find_element(By.CLASS_NAME, "confirm-paybtn.active").click()
+                WebDriverWait(WebDriver, 1).until(
+                    EC.element_to_be_clickable((By.ID, id))
+                ).click()
+            except TimeoutException:
+                print("未检测到需要选择的场次/座位，继续流程")
+
+            WebDriverWait(WebDriver, 5).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, 'finish-btn.active'))
+            ).click()
+            print("选座创建完成，准备付款")
+
+            # --- 提交订单 ---
+            WebDriverWait(WebDriver, 5).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, 'confirm-paybtn.active'))
+            ).click()
+
             print("订单创建完成，请在一分钟内付款")
+
             return
-        except:
-            print("无法点击创建订单")
+
+        except TimeoutException as e:
+            WebDriver.refresh()  # 刷新页面重试
+
+        except Exception as e:
+            WebDriver.refresh()
 
 
 if __name__ == '__main__':
